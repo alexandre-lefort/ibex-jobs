@@ -299,10 +299,8 @@ Optim::Status OptimMinMax::optimize(const IntervalVector& x_box_ini1, double obj
     vector<bool> handle_res = vector<bool>(num_thread);
 
     if(!handle_cell(root,0)) { return INFEASIBLE; }
-    if (loup_changed) {
-        ymax = compute_ymax();
-        buffer->contract(ymax);
-    }
+    ymax = compute_ymax();
+    buffer->contract(ymax);
     update_uplo();
 
     Timer::reset_time();

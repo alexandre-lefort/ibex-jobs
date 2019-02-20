@@ -10,6 +10,10 @@
 #include "ibex_Optim.h"
 #include <stdio.h>
 #include "ibex_Timer.h"
+#include <iostream>
+#include <fstream>
+
+using namespace std;
 
 namespace ibex {
 
@@ -107,18 +111,26 @@ void Optim::update_uplo_of_epsboxes(double ymin) {
 
 void Optim::report() {
 
+    ofstream result;
+    result.open("result.txt");
 	if (timeout >0 &&  time >=timeout ) {
 		std::cout << "time limit " << timeout << "s. reached " << std::endl;
+        result << "time limit " << timeout << "s. reached\n ";
 	}
+
 	// No solution found and optimization stopped with empty buffer  before the required precision is reached => means infeasible problem
 	if (buffer->empty() && uplo_of_epsboxes == POS_INFINITY && (loup==POS_INFINITY || (loup==initial_loup && goal_abs_prec==0 && goal_rel_prec==0))) {
-		std::cout << " infeasible problem " << std::endl;
-		std::cout << " cpu time used " << time << "s." << std::endl;
-		std::cout << " number of cells " << nb_cells << std::endl;
+        std::cout << " infeasible problem " << std::endl;
+        std::cout << " cpu time used " << time << "s." << std::endl;
+        std::cout << " number of cells " << nb_cells << std::endl;
+        result << " infeasible problem " << " \n" ;
+        result << " cpu time used " << time << "s." << " \n" ;
+        result << " number of cells " << nb_cells << " \n" ;
 	}
 
 	else {
 		std::cout << " best bound in: [" << uplo << "," << loup << "]" << std::endl;
+        result    << " best bound in: [" << uplo << "," << loup << "]" << " \n" ;
 
 		double rel_prec;
 
@@ -134,26 +146,36 @@ void Optim::report() {
 
 		std::cout << " Absolute precision obtained on objective function: " << abs_prec << " " <<
 				(abs_prec <= goal_abs_prec? " [passed]" : " [failed]") << "  " << goal_abs_prec << std::endl;
-		if (uplo_of_epsboxes != NEG_INFINITY && uplo_of_epsboxes != POS_INFINITY)
+
+        result << " Relative precision obtained on objective function: " << rel_prec << " " <<
+                (rel_prec <= goal_rel_prec? " [passed]" : " [failed]") << "  " << goal_rel_prec << " \n" ;
+
+        result << " Absolute precision obtained on objective function: " << abs_prec << " " <<
+                (abs_prec <= goal_abs_prec? " [passed]" : " [failed]") << "  " << goal_abs_prec << " \n" ;
+
+        if (uplo_of_epsboxes != NEG_INFINITY && uplo_of_epsboxes != POS_INFINITY) {
 			std::cout << " precision on variable domains obtained " << prec << " "   << " uplo_of_epsboxes " << uplo_of_epsboxes << std::endl;
-		else if (uplo_of_epsboxes == NEG_INFINITY)
-			std::cout << " small boxes with negative infinity objective :  objective not bound " << std::endl;
-		if (loup==initial_loup)
+            result    << " precision on variable domains obtained " << prec << " "   << " uplo_of_epsboxes " << uplo_of_epsboxes << " \n" ;
+        } else if (uplo_of_epsboxes == NEG_INFINITY) {
+            std::cout << " small boxes with negative infinity objective :  objective not bound " << std::endl;
+            result << " small boxes with negative infinity objective :  objective not bound " << " \n" ;
+        }
+        if (loup==initial_loup) {
 			std::cout << " no feasible point found " << std::endl;
-		else
+            result    << " no feasible point found " << " \n" ;
+        } else {
 			std::cout << " best feasible point " << loup_point << std::endl;
+            result    << " best feasible point " << loup_point << " \n" ;
+        }
 
 
 		std::cout << " cpu time used " << time << "s." << std::endl;
 		std::cout << " number of cells " << nb_cells << std::endl;
+        result    << " cpu time used " << time << "s." << " \n" ;
+        result    << " number of cells " << nb_cells << " \n" ;
 	}
-	/*   // statistics on upper bounding
-    if (trace) {
-      std::cout << " nbrand " << nb_rand << " nb_inhc4 " << nb_inhc4 << " nb simplex " << nb_simplex << std::endl;
-      std::cout << " diam_rand " << diam_rand << " diam_inhc4 " << diam_inhc4 << " diam_simplex " << diam_simplex << std::endl;
-    }
-	 */
 }
+
 /* minimal report for benchmarking */
 void Optim::time_cells_report() {
 	if (timeout >0 &&  time >=timeout ) {

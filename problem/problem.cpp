@@ -52,7 +52,7 @@ void sm_2_barres() {
     p_ini[0] = Interval(CzW0 - eps*fabs(CzW0), CzW0 + eps*fabs(CzW0));
     p_ini[1] = Interval(CmQ0 - eps*fabs(CmQ0), CmQ0 + eps*fabs(CmQ0));
 
-    int num_thread = 2;
+    int num_thread = 16;
 
     double x_prec(1e-10), y_prec(1e-10), stop_prec(0.1);
 
@@ -112,31 +112,31 @@ void sm_2_barres() {
         fa_y_ctc.push_back(  new CtcIdentity(x_ini.size()+p_ini.size()));       
     }
 
-    double prec_fa_y = 1e-5;
+    double prec_fa_y = 1e-10;
 
     OptimMinMax oo(sys_x, sys_xy, fa_y_sys, x_ctc_id, xy_ctc, fa_y_ctc, x_prec, y_prec,stop_prec,prec_fa_y, num_thread);
     
-    oo.list_elem_absolute_max = 500;
+    oo.list_elem_absolute_max = 0;
     oo.list_rate = 0;
     oo.critpr = 0.4;
-    oo.heap_prob = 0.5;
+    oo.heap_prob = 0.1;
     oo.min_prec_coef = 10;
     oo.iter = 10;
     oo.visit_all = false;
-    oo.nb_point = 1;
+    oo.nb_point = 2;
 
-    oo.list_elem_absolute_max_csp = 500;
+    oo.list_elem_absolute_max_csp = 0;
     oo.iter_csp = 10;
     oo.critpr_csp = 0.3;
     oo.list_rate_csp = 0;
     oo.min_prec_coef_csp = 10;
-    oo.visit_all_csp = false;
+    oo.visit_all_csp = true;
 
     oo.trace=1;
     oo.trace_freq = 1;
-    oo.timeout=600;
+    oo.timeout=3600;
 
-    Optim::Status res = oo.optimize(x_ini);
+    Optim::Status res = oo.optimize(x_ini,20);
 
     oo.report();
 
