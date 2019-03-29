@@ -134,7 +134,7 @@ void sm_2_barres() {
 
     oo.trace=1;
     oo.trace_freq = 1;
-    oo.timeout=7200*60;
+    oo.timeout=7200*2500;
 
     Optim::Status res = oo.optimize(x_ini);
 
