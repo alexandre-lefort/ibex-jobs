@@ -1,12 +1,10 @@
 FROM ubuntu:16.04
 
-RUN apt-get update
+RUN apt-get update -y
 
-RUN apt-get -qq -y install pkg-config flex bison git python gcc g++ apt-utils
+Run apt-get upgrade -y
 
-RUN apt-get update
-
-RUN apt-get -y upgrade
+RUN apt-get -qq -y install pkg-config flex bison git python gcc g++ apt-utils -y
 
 RUN git clone https://github.com/alexandre-lefort/ibex-jobs.git
 
