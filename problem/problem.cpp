@@ -23,7 +23,7 @@ void sm_2_barres() {
     double kpt20 = -1.8123   ;  
     double kdt20 = -0.8398   ;  
     
-    double eps_ctrl = 0.8;
+    double eps_ctrl = 5;
 
     x_ini[0] = Interval(kpz10 - eps_ctrl*fabs(kpz10), kpz10 + eps_ctrl*fabs(kpz10));
     x_ini[1] = Interval(kdz10 - eps_ctrl*fabs(kdz10), kdz10 + eps_ctrl*fabs(kdz10));
@@ -37,7 +37,7 @@ void sm_2_barres() {
 
     double CzW0 = -2.7  ;
     double CmQ0 = -0.38 ;
-    double eps  =  0.1  ;
+    double eps  =  0.15 ;
     
     Variable y(3);
     IntervalVector y_ini(3);
@@ -134,9 +134,9 @@ void sm_2_barres() {
 
     oo.trace=1;
     oo.trace_freq = 1;
-    oo.timeout=3600;
+    oo.timeout=7200*60;
 
-    Optim::Status res = oo.optimize(x_ini,20);
+    Optim::Status res = oo.optimize(x_ini);
 
     oo.report();
 
