@@ -15,5 +15,3 @@ RUN bin/bash -c "cd /ibex-jobs/ibex-lib && \
 
 RUN bin/bash -c "cd /ibex-jobs/problem && make"
 
-RUN bin/bash -c "cd /ibex-jobs/problem && ./problem"
-
