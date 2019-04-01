@@ -13,5 +13,5 @@ RUN bin/bash -c "cd /ibex-jobs/ibex-lib && \
                  ./waf install && \
                  cd ../../ "
 
-RUN bin/bash -c "cd /ibex-jobs/problem && make"
+RUN bin/bash -c "cd /ibex-jobs/problem_labrax && make && ./labrax_depth"
 

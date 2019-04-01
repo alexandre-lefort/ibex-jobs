@@ -133,7 +133,7 @@ void labrax_depth() {
 
     oo.trace=1;
     oo.trace_freq = 10;
-    oo.timeout=300*2500;
+    oo.timeout=300*2500*100;
 
     Optim::Status res = oo.optimize(x_ini);
 
