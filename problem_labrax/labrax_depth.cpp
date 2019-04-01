@@ -18,7 +18,7 @@ void labrax_depth() {
     double kq     = 0.0;
     double iz     = 0.0;
     
-    double eps_ctrl = 3.0;
+    double eps_ctrl = 5.0;
 
     x_ini[0] = Interval(kz     - eps_ctrl , kz     + eps_ctrl);
     x_ini[1] = Interval(ktheta - eps_ctrl , ktheta + eps_ctrl);
@@ -30,7 +30,7 @@ void labrax_depth() {
     double CzW0  = -2.6126 ;
     double CmB10 = -0.7155 ;
     double CzB10 = -1.2233 ;
-    double eps   =  0.0;
+    double eps   =  0.2;
 
     Variable y(5);
     IntervalVector y_ini(5);
