@@ -67,11 +67,11 @@ void labrax_depth() {
 
     for (int i = 0 ; i <num_thread ; i++) {
 
-        Function crit_hinf_zz1("functions/Tzz1.txt" ) ;
-        Function crit_hinf_zz2("functions/Tzz2.txt" ) ;
-        Function crit_hinf_zb1("functions/Tzb.txt" ) ;
+        Function crit_hinf_zz1("Tzz1.txt" ) ;
+        Function crit_hinf_zz2("Tzz2.txt" ) ;
+        Function crit_hinf_zb1("Tzb.txt" ) ;
     
-        coeffs.push_back(new Function("functions/Tstab_coefs.txt"));
+        coeffs.push_back(new Function("Tstab_coefs.txt"));
 
         const ExprNode& stab1 = (*coeffs[i])(x,p)[0];
         const ExprNode& stab2 = (*coeffs[i])(x,p)[1];
