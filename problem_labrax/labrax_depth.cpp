@@ -49,7 +49,7 @@ void labrax_depth() {
     p_ini[2] = Interval(CmB10 + eps*fabs(CmB10), CmB10 + eps*fabs(CmB10));
     p_ini[3] = Interval(CzB10 + eps*fabs(CzB10), CzB10 + eps*fabs(CzB10));
 
-    int num_thread = 8;
+    int num_thread = 128;
 
     double x_prec(1e-6), y_prec(1e-9), stop_prec(0.1);
 
@@ -133,7 +133,7 @@ void labrax_depth() {
 
     oo.trace=1;
     oo.trace_freq = 10;
-    oo.timeout=300;
+    oo.timeout=300*2500;
 
     Optim::Status res = oo.optimize(x_ini);
 
