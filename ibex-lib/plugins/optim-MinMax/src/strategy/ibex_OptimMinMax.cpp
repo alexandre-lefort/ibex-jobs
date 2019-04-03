@@ -19,6 +19,8 @@
 #define SATISFIED      2
 
 
+
+
 using namespace std;
 
 namespace ibex {
@@ -267,6 +269,7 @@ Optim::Status OptimMinMax::optimize(const IntervalVector& x_box_ini1, double obj
 
     //****** initialization of the first Cell********
     Cell * root = new Cell(x_box_init);
+    volume = x_box_init.volume();
     buffer->cost1().add_backtrackable(*root);
     buffer->cost2().add_backtrackable(*root);
 
@@ -284,6 +287,7 @@ Optim::Status OptimMinMax::optimize(const IntervalVector& x_box_ini1, double obj
     //****** x_heap initialization ********
 
     nb_cells = 0;
+    int deleted = 0;
     buffer->flush();
 
     // *** initialisation Algo ***
@@ -307,6 +311,7 @@ Optim::Status OptimMinMax::optimize(const IntervalVector& x_box_ini1, double obj
     Timer::start();
 
     //cout<<"start optimization loop"<<endl;
+    int start = 1;
 
     try {
         while (!buffer->empty() && (loup-uplo)>goal_rel_prec) {
@@ -314,6 +319,8 @@ Optim::Status OptimMinMax::optimize(const IntervalVector& x_box_ini1, double obj
             if (trace >= 2) buffer->print(cout);
             loup_changed = false;
             Cell *c = buffer->pop();
+
+            double volume_old = volume;
 
             //====== only for purtpose of non inheritance comparison
             if(!propag){
@@ -331,18 +338,31 @@ Optim::Status OptimMinMax::optimize(const IntervalVector& x_box_ini1, double obj
                     data_x_csp->y_heap->push(y_cell_csp);
                 }
             }
-
+            int total = 1024;
             try {
-                // omp
                 std::vector<Cell*> new_cells = nsect_cell(num_thread, c);
-                delete c;
-                
-                #pragma omp parallel num_threads(num_thread)
-                {
-                    int ID = omp_get_thread_num();
-                    handle_res[ID] = handle_cell(new_cells[ID], ID);
+
+                if (start == 1) {
+                    new_cells = nsect_cell(total, c);
                 }
-                // end omp
+                volume -= c->box.volume();  
+                delete c;
+                start = 0;
+
+                //double max_diam = 500.0;
+                //for (int nn = 0 ; nn < total ; nn++) {
+                //    if (new_cells[nn]->box.max_diam() < max_diam) max_diam = new_cells[nn]->box.max_diam();
+                //}
+                //cout << "max diam =" << max_diam << endl;
+                //cout << "size     =" << total << endl;
+                int buffer_before = buffer->size();
+                #pragma omp parallel for num_threads(num_thread)
+                for (int nn = 0 ; nn < new_cells.size() ; nn++) {
+                    int ID = omp_get_thread_num();
+                    handle_res[ID] = handle_cell(new_cells[nn], ID);
+                }
+                int differ = buffer_before - buffer->size() + new_cells.size();
+                deleted += differ;
 
                 if (uplo_of_epsboxes == NEG_INFINITY) {
                     cout << " possible infinite minimum " << endl;
@@ -357,9 +377,9 @@ Optim::Status OptimMinMax::optimize(const IntervalVector& x_box_ini1, double obj
                         if (trace) cout << " infinite value for the minimum " << endl;
                         break;
                     }
-                    if (trace) cout <<  "iter="<< nb_cells <<",  size_heap="<< buffer->size()<< ",  ymax=" << ymax << ",  uplo= " <<  uplo<< endl;
+                    if (trace) cout <<  "iter="<< nb_cells <<",  size_heap="<< buffer->size()<< ",  ymax=" << ymax << ",  uplo= " <<  uplo << ", volume = " << volume << ", nb_cells = " << deleted << endl;
                 }
-                if (trace) cout <<  "iter="<< nb_cells <<",  size_heap="<< buffer->size()<< ",  ymax=" << ymax << ",  uplo= " <<  uplo<< endl;
+                if (trace) cout <<  "iter="<< nb_cells <<",  size_heap="<< buffer->size()<< ",  ymax=" << ymax << ",  uplo= " <<  uplo << ", volume = " << volume << ", nb_cells = " << deleted << endl;
                 update_uplo();
 
                 Timer::check(timeout);
@@ -401,13 +421,20 @@ std::vector<Cell*> OptimMinMax::nsect_cell(int n, Cell *c) {
     std::vector<Cell*> cells_2 = std::vector<Cell*>();
 
     cells_1.push_back(c);
+    double aux = 0;
+    double max_diam = 500.0;
 
     for (int i = 0 ; i < nstep ; i++) {
-        for (int j = 0 ; j < std::pow(2,i) ; j ++) {
+        max_diam = 500.0;
+        //cout << "number of cells =" << cells_1.size() << endl;
+        for (int j = 0 ; j < cells_1.size() ; j ++) {
+            aux = cells_1[j]->box.max_diam();
+            if (max_diam > aux) max_diam = aux;
             pair<Cell*,Cell*> new_cells = bsc[0]->bisect_cell(*cells_1[j]);
             cells_2.push_back(new_cells.first);
             cells_2.push_back(new_cells.second);
         }
+        //cout << "biggest cell   =" << max_diam << endl;
         cells_1 = cells_2;
         cells_2.clear();
     }
@@ -546,6 +573,7 @@ bool  OptimMinMax::handle_cell(Cell * x_cell, int ith) {
     buffer->cost2().set_optim_data(*x_cell, *x_sys[ith]);
     buffer->push(x_cell);
     nb_cells++;
+    volume += x_cell->box.volume();  
     omp_unset_lock(&bufferlock);
     return true;
 }

@@ -85,6 +85,7 @@ uint32_t RNG::rand () { //period 2^96-1
 	/** This function serves to obtain a random number \c 
 	 \return An integer in the interval [0,UINT32_MAX].
 	 */
+
  	uint32_t t;
  	x ^= x << 16;
  	x ^= x >> 5;
@@ -102,12 +103,13 @@ uint32_t RNG::rand () { //period 2^96-1
 } // end namespace ibex
 #else
 #include <stdlib.h>
+#include <iostream>
 
 bool ibex::RNG::srand(){ ::srand(::rand()+10);  return true; }
 
 bool ibex::RNG::srand(unsigned long s){  ::srand(s); return true; }
 
-uint32_t ibex::RNG::rand () { return ::rand(); }
+uint32_t ibex::RNG::rand () {return ::rand(); }
 
 
 #endif

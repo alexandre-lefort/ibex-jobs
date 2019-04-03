@@ -47,7 +47,7 @@
 // Max uint32 for random number generator
 #if !defined(UINT32_MAX)
 typedef unsigned int uint32_t;
-#define UINT32_MAX	0xffffffff
+#define UINT32_MAX	0xffffffffu
 #endif
 
 namespace ibex {
@@ -59,7 +59,7 @@ namespace ibex {
 		static bool srand();
 		static bool srand(unsigned long s);
 		static uint32_t rand();
-		static double rand(double a, double b){return a+((double)(b-a)*RNG::rand())/UINT32_MAX;}
+		static double rand(double a, double b){return a+(b-a)*RNG::rand()/UINT32_MAX;}
 		
 	private:
 		static uint32_t x,y,z;

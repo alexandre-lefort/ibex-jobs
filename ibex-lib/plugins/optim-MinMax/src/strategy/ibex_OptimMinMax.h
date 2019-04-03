@@ -120,6 +120,8 @@ public:
     bool   fa_y_cst                   ; // indicates if there is for all y constraints
     bool   min_goal                   ; // true if minimization problem, false if min max problem
     double prec_fa_y                  ;
+    double volume                     ;
+    int    deleted                    ;
 
     omp_lock_t bufferlock ;
 
